@@ -1,7 +1,7 @@
 "use client"
 
 import { useFormStatus } from "react-dom"
-import { useActionState } from "react"
+import { useActionState, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -54,6 +54,22 @@ function SubmitButton() {
 
 export default function SignUpForm() {
   const [state, formAction] = useActionState(submitSignUp, initialState)
+  const [selectedChallenges, setSelectedChallenges] = useState<string[]>([])
+  const [otherChallengeText, setOtherChallengeText] = useState("")
+
+  const handleChallengeChange = (challenge: string, checked: boolean) => {
+    if (checked) {
+      setSelectedChallenges([...selectedChallenges, challenge])
+    } else {
+      setSelectedChallenges(selectedChallenges.filter((c) => c !== challenge))
+      // Clear the other text if "Other" is unchecked
+      if (challenge === "Other: Please Specify") {
+        setOtherChallengeText("")
+      }
+    }
+  }
+
+  const isOtherSelected = selectedChallenges.includes("Other: Please Specify")
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-12">
@@ -141,6 +157,8 @@ export default function SignUpForm() {
                           id={`challenge-${index}`}
                           name="challenges"
                           value={challenge}
+                          checked={selectedChallenges.includes(challenge)}
+                          onCheckedChange={(checked) => handleChallengeChange(challenge, checked as boolean)}
                           className="border-gray-300 data-[state=checked]:bg-pink-500 data-[state=checked]:border-pink-500"
                         />
                         <Label htmlFor={`challenge-${index}`} className="text-sm text-gray-600 cursor-pointer">
@@ -149,6 +167,25 @@ export default function SignUpForm() {
                       </div>
                     ))}
                   </div>
+
+                  {/* Other Challenge Input Box */}
+                  {isOtherSelected && (
+                    <div className="mt-4 p-4 bg-pink-50 border border-pink-200 rounded-lg">
+                      <Label htmlFor="otherChallenge" className="text-gray-700 font-medium mb-2 block">
+                        Please specify your other learning challenge:
+                      </Label>
+                      <Input
+                        id="otherChallenge"
+                        name="otherChallenge"
+                        type="text"
+                        placeholder="Describe your specific learning challenge..."
+                        value={otherChallengeText}
+                        onChange={(e) => setOtherChallengeText(e.target.value)}
+                        className="border-pink-300 focus:border-pink-500 focus:ring-pink-500"
+                        required={isOtherSelected}
+                      />
+                    </div>
+                  )}
                 </div>
 
                 {/* Stay in Loop */}

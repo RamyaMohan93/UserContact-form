@@ -21,13 +21,22 @@ export async function submitSignUp(_prev: ActionResult | null, formData: FormDat
 
   // Get all selected challenges
   const challenges = formData.getAll("challenges").filter((c) => typeof c === "string") as string[]
+  const otherChallenge = f("otherChallenge")
+
+  // If "Other" is selected and user provided text, replace it with the custom text
+  const finalChallenges = challenges.map((challenge) => {
+    if (challenge === "Other: Please Specify" && otherChallenge) {
+      return `Other: ${otherChallenge}`
+    }
+    return challenge
+  })
 
   const signUp = {
     name: f("name"),
     country_code: f("countryCode"),
     phone: f("phone"),
     email: f("email").toLowerCase(),
-    challenges: challenges.join(", "),
+    challenges: finalChallenges.join(", "),
     stay_in_loop: formData.get("stayInLoop") === "yes",
     subject: f("subject"),
   }
@@ -41,6 +50,10 @@ export async function submitSignUp(_prev: ActionResult | null, formData: FormDat
   }
   if (challenges.length === 0) {
     return { success: false, error: "Please select at least one learning challenge." }
+  }
+  // Validate that if "Other" is selected, the text field is filled
+  if (challenges.includes("Other: Please Specify") && !otherChallenge) {
+    return { success: false, error: "Please specify your other learning challenge." }
   }
 
   /* ---------- Store in Database ---------- */
