@@ -9,7 +9,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { submitContact } from "@/app/actions/contact"
-import { CheckCircle, AlertCircle } from "lucide-react"
+import { CheckCircle, AlertCircle, Mail } from "lucide-react"
 
 const initialState = null
 
@@ -17,7 +17,8 @@ function SubmitButton() {
   const { pending } = useFormStatus()
   return (
     <Button type="submit" className="w-full" disabled={pending}>
-      {pending ? "Submitting..." : "Send Message"}
+      <Mail className="w-4 h-4 mr-2" />
+      {pending ? "Sending..." : "Send Message"}
     </Button>
   )
 }
@@ -29,7 +30,10 @@ export default function ContactForm() {
     <Card className="w-full max-w-2xl mx-auto">
       <CardHeader>
         <CardTitle>Contact Us</CardTitle>
-        <CardDescription>Fill out the form below and we&apos;ll get back to you as soon as possible.</CardDescription>
+        <CardDescription>
+          Fill out the form below and we'll send your message directly to our email. We'll get back to you as soon as
+          possible.
+        </CardDescription>
       </CardHeader>
 
       <CardContent>
@@ -86,8 +90,7 @@ export default function ContactForm() {
                 ) : (
                   <>
                     <strong>{state.error}</strong>
-                    {state.details && <div className="mt-1">{state.details}</div>}
-                    {state.hint && <div className="mt-1 italic text-gray-500">{state.hint}</div>}
+                    {state.details && <div className="mt-1 text-sm">{state.details}</div>}
                   </>
                 )}
               </AlertDescription>
