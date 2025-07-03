@@ -42,13 +42,42 @@ const countryCodes = [
 function SubmitButton() {
   const { pending } = useFormStatus()
   return (
-    <Button
-      type="submit"
-      className="w-full bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 text-white font-semibold py-3 px-8 rounded-full text-lg shadow-lg transform transition hover:scale-105"
-      disabled={pending}
-    >
-      {pending ? "Signing Up..." : "Sign Up"}
-    </Button>
+    <div className="relative group">
+      {/* Glowing background effect */}
+      <div className="absolute -inset-1 bg-gradient-to-r from-pink-500 via-purple-500 to-cyan-500 rounded-full blur opacity-75 group-hover:opacity-100 transition duration-1000 group-hover:duration-200 animate-pulse"></div>
+
+      {/* Main button */}
+      <Button
+        type="submit"
+        className="relative w-full bg-gradient-to-r from-pink-500 via-pink-600 to-purple-600 hover:from-pink-600 hover:via-purple-600 hover:to-cyan-600 text-white font-bold py-4 px-8 rounded-full text-lg shadow-2xl transform transition-all duration-300 hover:scale-105 hover:shadow-pink-500/25 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+        disabled={pending}
+      >
+        {/* Button content with icon */}
+        <div className="flex items-center justify-center space-x-3">
+          {pending ? (
+            <>
+              <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+              <span className="tracking-wide">PROCESSING...</span>
+            </>
+          ) : (
+            <>
+              <span className="tracking-wide font-semibold">SIGN UP NOW</span>
+              <div className="w-6 h-6 bg-white/20 rounded-full flex items-center justify-center">
+                <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                </svg>
+              </div>
+            </>
+          )}
+        </div>
+
+        {/* Shimmer effect */}
+        <div className="absolute inset-0 rounded-full bg-gradient-to-r from-transparent via-white/20 to-transparent transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+      </Button>
+
+      {/* Additional glow on hover */}
+      <div className="absolute inset-0 rounded-full bg-gradient-to-r from-pink-400/0 via-pink-400/20 to-purple-400/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+    </div>
   )
 }
 
