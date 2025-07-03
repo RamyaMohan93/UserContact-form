@@ -1,7 +1,6 @@
 "use server"
 
-import { supabaseAdmin } from "@/lib/supabase-admin"
-import { sendContactEmail } from "@/lib/email"
+import { supabaseAdmin as supabase } from "@/lib/supabase-admin"
 import { revalidatePath } from "next/cache"
 
 type ActionResult = { success: true; message: string } | { success: false; error: string; details?: string }
@@ -28,36 +27,17 @@ export async function submitContact(_prev: ActionResult | null, formData: FormDa
     return { success: false, error: "Please enter a valid email address." }
   }
 
-  /* ---------- Store in Database ---------- */
-  if (supabaseAdmin) {
-    try {
-      await supabaseAdmin.from("contacts").insert(contact).throwOnError()
-    } catch (e: any) {
-      console.error("Supabase insert error →", { message: e?.message, details: e?.details })
-      // Continue with email sending even if database fails
-    }
-  }
-
-  /* ---------- Send Email ---------- */
-  const emailResult = await sendContactEmail({
-    firstName: contact.first_name,
-    lastName: contact.last_name,
-    email: contact.email,
-    phoneNumber: contact.phone_number || undefined,
-    message: contact.message,
-  })
-
-  if (!emailResult.success) {
-    return {
-      success: false,
-      error: "Failed to send email notification",
-      details: emailResult.error,
-    }
+  /* ---------- Insert ---------- */
+  try {
+    await supabase.from("contacts").insert(contact).throwOnError()
+  } catch (e: any) {
+    // PostgrestError fields are non-enumerable; pull them out explicitly
+    const msg = e?.message || "Insert blocked (likely RLS - see console)"
+    const det = e?.details
+    console.error("Supabase insert error →", { message: msg, details: det })
+    return { success: false, error: msg, details: det }
   }
 
   revalidatePath("/contact")
-  return {
-    success: true,
-    message: "Thank you for your message! We've received your submission and will get back to you soon.",
-  }
+  return { success: true, message: "Thank you for your message! We'll get back to you soon." }
 }
